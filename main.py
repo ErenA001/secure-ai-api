@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Header, status
+from middleware.logger import AuditMiddleware
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
 import time
@@ -12,6 +13,7 @@ from models.schemas import (
 )
 
 app = FastAPI(title="Secure AI Gateway v2")
+app.add_middleware(AuditMiddleware)
 
 SECRET = "supersecretkey_minimum32bytes_pad!!"
 ALGORITHM = "HS256"
