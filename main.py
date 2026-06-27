@@ -1,14 +1,17 @@
+import os
+import time
+
+import jwt
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Header, Request, status
-from middleware.logger import AuditMiddleware
+from jwt import ExpiredSignatureError, InvalidTokenError
+
 from middleware.brute_force import (
     check_brute_force,
     record_failed_attempt,
     record_successful_login,
 )
-import jwt
-from jwt import ExpiredSignatureError, InvalidTokenError
-import time
-
+from middleware.logger import AuditMiddleware
 from models.schemas import (
     HealthResponse,
     LoginRequest,
@@ -17,15 +20,26 @@ from models.schemas import (
     PredictResponse,
 )
 
+load_dotenv()
+
 app = FastAPI(title="Secure AI Gateway v2")
 app.add_middleware(AuditMiddleware)
 
-SECRET = "supersecretkey_minimum32bytes_pad!!"
-ALGORITHM = "HS256"
-TOKEN_EXP_SECONDS = 3600
+SECRET = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+TOKEN_EXP_SECONDS = int(os.getenv("TOKEN_EXP_SECONDS", "3600"))
 
-DEMO_USER = "eren"
-DEMO_PASSWORD = "secure123"
+DEMO_USER = os.getenv("DEMO_USER")
+DEMO_PASSWORD = os.getenv("DEMO_PASSWORD")
+
+if not SECRET:
+    raise RuntimeError("SECRET_KEY is missing. Please define it in .env.")
+
+if len(SECRET) < 32:
+    raise RuntimeError("SECRET_KEY must be at least 32 characters long.")
+
+if not DEMO_USER or not DEMO_PASSWORD:
+    raise RuntimeError("DEMO_USER and DEMO_PASSWORD must be defined in .env.")
 
 
 # -----------------------

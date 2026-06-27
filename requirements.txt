@@ -1,7 +1,8 @@
 fastapi
-uvicorn
-pyjwt
 numpy
-scikit-learn
-redis
 prometheus-client
+pyjwt
+python-dotenv
+redis
+scikit-learn
+uvicorn
