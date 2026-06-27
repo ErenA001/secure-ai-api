@@ -1,5 +1,10 @@
-from fastapi import FastAPI, HTTPException, Header, status
+from fastapi import FastAPI, HTTPException, Header, Request, status
 from middleware.logger import AuditMiddleware
+from middleware.brute_force import (
+    check_brute_force,
+    record_failed_attempt,
+    record_successful_login,
+)
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
 import time
@@ -18,6 +23,9 @@ app.add_middleware(AuditMiddleware)
 SECRET = "supersecretkey_minimum32bytes_pad!!"
 ALGORITHM = "HS256"
 TOKEN_EXP_SECONDS = 3600
+
+DEMO_USER = "eren"
+DEMO_PASSWORD = "secure123"
 
 
 # -----------------------
@@ -115,12 +123,24 @@ def root():
     }
 
 
-@app.post("/login", response_model=LoginResponse)
-def login(payload: LoginRequest):
-    token = create_token(payload.user)
+@app.post("/login", response_model=LoginResponse, tags=["auth"])
+def login(body: LoginRequest, request: Request):
+    check_brute_force(request)
+
+    if body.user != DEMO_USER or body.password != DEMO_PASSWORD:
+        record_failed_attempt(request, body.user)
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password"
+        )
+
+    token = create_token(body.user)
+
+    record_successful_login(request, body.user)
 
     return {
-        "user": payload.user.strip(),
+        "user": body.user.strip(),
         "access_token": token,
         "token_type": "bearer"
     }
