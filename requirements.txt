@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pyjwt
+numpy
+scikit-learn
+redis
+prometheus-client
