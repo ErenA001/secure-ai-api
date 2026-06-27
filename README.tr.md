@@ -264,8 +264,8 @@ Demo credentials artık lokal `.env` dosyasından yüklenir.
 Örnek lokal demo değerleri:
 
 ```text
-DEMO_USER=eren
-DEMO_PASSWORD=secure123
+DEMO_USER=your_username
+DEMO_PASSWORD=your_password
 ```
 
 Request:
@@ -273,14 +273,14 @@ Request:
 ```bash
 curl -X POST "http://127.0.0.1:8000/login" \
 -H "Content-Type: application/json" \
--d '{"user":"eren","password":"secure123"}'
+-d '{"user":"your_username","password":"your_password"}'
 ```
 
 Örnek response:
 
 ```json
 {
-  "user": "eren",
+  "user": "your_username",
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
   "token_type": "bearer"
 }
@@ -295,7 +295,7 @@ curl -X POST "http://127.0.0.1:8000/login" \
 ```bash
 TOKEN=$(curl -s -X POST "http://127.0.0.1:8000/login" \
 -H "Content-Type: application/json" \
--d '{"user":"eren","password":"secure123"}' | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
+-d '{"user":"your_username","password":"your_password"}' | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
 ```
 
 Sonra `/predict` endpoint'ine istek at:
@@ -350,7 +350,7 @@ for i in {1..6}; do
   echo "--- attempt $i ---"
   curl -s -X POST "http://127.0.0.1:8000/login" \
   -H "Content-Type: application/json" \
-  -d '{"user":"eren","password":"wrongpass"}'
+  -d '{"user":"your_username","password":"wrong_password"}'
   echo
 done
 ```
@@ -374,8 +374,8 @@ cat logs/audit.log
 Örnek log kayıtları:
 
 ```json
-{"timestamp":"2026-06-27T11:33:05.181517+00:00","event":"failed_login","ip":"127.0.0.1","username":"eren","attempts":1,"status":401}
-{"timestamp":"2026-06-27T11:33:05.230679+00:00","event":"brute_force_blocked","ip":"127.0.0.1","username":"eren","attempts":5,"status":429,"block_seconds":900}
+{"timestamp":"2026-06-27T11:33:05.181517+00:00","event":"failed_login","ip":"127.0.0.1","username":"your_username","attempts":1,"status":401}
+{"timestamp":"2026-06-27T11:33:05.230679+00:00","event":"brute_force_blocked","ip":"127.0.0.1","username":"your_username","attempts":5,"status":429,"block_seconds":900}
 ```
 
 ---
