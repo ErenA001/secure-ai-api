@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/FastAPI-Backend-green" />
   <img src="https://img.shields.io/badge/Security-JWT%20%7C%20Audit%20Logs%20%7C%20Brute%20Force-red" />
   <img src="https://img.shields.io/badge/AI-Prompt%20Injection%20Guard-purple" />
+  <img src="https://img.shields.io/badge/Config-.env-orange" />
 </p>
 
 <p align="center">
@@ -21,7 +22,7 @@
 
 **Secure AI Gateway** is a security-focused backend project built with FastAPI.
 
-It combines API security, AI security, and backend architecture in one practical system. The project demonstrates how an AI-powered API can be protected with authentication, validation, audit logging, prompt injection detection, and brute-force login protection.
+It combines API security, AI security, and backend architecture in one practical system. The project demonstrates how an AI-powered API can be protected with authentication, validation, audit logging, prompt injection detection, brute-force login protection, and environment-based configuration.
 
 This repository is designed as a portfolio-grade project for cybersecurity, AI security, and backend engineering.
 
@@ -40,6 +41,7 @@ A secure AI API should include:
 - Security event tracking
 - Prompt injection detection
 - Protected inference endpoints
+- Safe configuration management
 
 This project provides a compact but realistic foundation for building secure AI API gateways.
 
@@ -54,6 +56,13 @@ This project provides a compact but realistic foundation for building secure AI 
 - Bearer token validation
 - Token expiration handling
 - Invalid token handling
+
+### Environment-Based Configuration
+
+- Secrets are loaded from `.env`
+- `.env` is ignored by Git
+- `.env.example` is included as a safe template
+- JWT secret, demo user, demo password, algorithm, and token lifetime are configurable
 
 ### Input Validation
 
@@ -106,6 +115,8 @@ Client
   v
 FastAPI Gateway
   |
+  +--> .env Configuration
+  |
   +--> Pydantic Validation
   |
   +--> JWT Authentication
@@ -130,6 +141,7 @@ secure-ai-api/
 ├── requirements.txt
 ├── README.md
 ├── README.tr.md
+├── .env.example
 ├── .gitignore
 │
 ├── models/
@@ -162,7 +174,7 @@ secure-ai-api/
     └── audit.log
 ```
 
-> `logs/` is ignored by Git because audit logs may contain sensitive runtime information.
+> `.env` and `logs/` are ignored by Git because they may contain sensitive runtime information.
 
 ---
 
@@ -194,7 +206,25 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Run the API
+### 4. Create Local Environment File
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` with your local values:
+
+```text
+SECRET_KEY=your-secret-key-minimum-32-chars
+DEMO_USER=your_username
+DEMO_PASSWORD=your_password
+ALGORITHM=HS256
+TOKEN_EXP_SECONDS=3600
+```
+
+For local demo testing, the project can use demo credentials. These values are for development only and should not be used in production.
+
+### 5. Run the API
 
 ```bash
 uvicorn main:app --reload
@@ -229,11 +259,13 @@ Example response:
 
 ### Login
 
-Demo credentials:
+Demo credentials are loaded from your local `.env` file.
+
+Example local demo values:
 
 ```text
-user: eren
-password: secure123
+DEMO_USER=eren
+DEMO_PASSWORD=secure123
 ```
 
 Request:
@@ -353,6 +385,7 @@ Example log entries:
 | Area | Status |
 |---|---|
 | JWT authentication | Implemented |
+| Environment-based configuration | Implemented |
 | Pydantic validation | Implemented |
 | Prompt injection detection | Implemented |
 | Audit logging | Implemented |
@@ -368,6 +401,7 @@ Example log entries:
 
 - [x] FastAPI application scaffold
 - [x] JWT authentication
+- [x] Environment-based configuration
 - [x] Pydantic schemas
 - [x] Protected AI prediction endpoint
 - [x] Prompt injection guard
@@ -389,19 +423,18 @@ This is an educational and portfolio-focused project.
 Current limitations:
 
 - Brute force protection is in-memory
-- Login uses demo credentials
-- JWT secret is hardcoded for development
+- Login uses local demo credentials from `.env`
 - Audit logs are local files
 - AI prediction is currently mocked
 
 Recommended production improvements:
 
-- Move secrets to environment variables
 - Replace demo login with real user storage
 - Add password hashing
 - Use Redis for distributed blocking and rate limiting
 - Add HTTPS behind a reverse proxy
 - Add monitoring and alerting
+- Rotate secrets regularly
 
 ---
 
@@ -412,6 +445,7 @@ Recommended production improvements:
 - Pydantic
 - PyJWT
 - Uvicorn
+- python-dotenv
 - Structured JSON logging
 
 ---

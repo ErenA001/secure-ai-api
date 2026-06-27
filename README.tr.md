@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/FastAPI-Backend-green" />
   <img src="https://img.shields.io/badge/Security-JWT%20%7C%20Audit%20Logs%20%7C%20Brute%20Force-red" />
   <img src="https://img.shields.io/badge/AI-Prompt%20Injection%20Guard-purple" />
+  <img src="https://img.shields.io/badge/Config-.env-orange" />
 </p>
 
 <p align="center">
@@ -21,7 +22,7 @@
 
 **Secure AI Gateway**, FastAPI ile geliştirilmiş güvenlik odaklı bir backend projesidir.
 
-Bu proje; API güvenliği, AI güvenliği ve backend mimarisini tek bir pratik sistem içinde birleştirir. Amaç, AI destekli bir API'nin yalnızca basit bir `/predict` endpoint'i olarak sunulmasının yeterli olmadığını; authentication, validation, audit logging, prompt injection detection ve brute-force koruması gibi katmanlara ihtiyaç duyduğunu göstermektir.
+Bu proje; API güvenliği, AI güvenliği ve backend mimarisini tek bir pratik sistem içinde birleştirir. Amaç, AI destekli bir API'nin yalnızca basit bir `/predict` endpoint'i olarak sunulmasının yeterli olmadığını; authentication, validation, audit logging, prompt injection detection, brute-force protection ve environment-based configuration gibi katmanlara ihtiyaç duyduğunu göstermektir.
 
 Bu repo; siber güvenlik, AI security ve backend engineering alanlarında portfolyo projesi olarak tasarlanmıştır.
 
@@ -40,6 +41,7 @@ Güvenli bir AI API şu katmanlara sahip olmalıdır:
 - Security event tracking
 - Prompt injection detection
 - Protected inference endpoints
+- Güvenli configuration management
 
 Bu proje, güvenli AI API Gateway mimarisi için küçük ama gerçekçi bir temel sunar.
 
@@ -54,6 +56,13 @@ Bu proje, güvenli AI API Gateway mimarisi için küçük ama gerçekçi bir tem
 - Bearer token validation
 - Token expiration handling
 - Invalid token handling
+
+### Environment-Based Configuration
+
+- Secret değerleri `.env` dosyasından yüklenir
+- `.env` Git tarafından ignore edilir
+- `.env.example` güvenli örnek template olarak repoda tutulur
+- JWT secret, demo user, demo password, algorithm ve token lifetime ayarlanabilir
 
 ### Input Validation
 
@@ -106,6 +115,8 @@ Client
   v
 FastAPI Gateway
   |
+  +--> .env Configuration
+  |
   +--> Pydantic Validation
   |
   +--> JWT Authentication
@@ -130,6 +141,7 @@ secure-ai-api/
 ├── requirements.txt
 ├── README.md
 ├── README.tr.md
+├── .env.example
 ├── .gitignore
 │
 ├── models/
@@ -162,7 +174,7 @@ secure-ai-api/
     └── audit.log
 ```
 
-> `logs/` klasörü Git tarafından ignore edilir. Çünkü audit log dosyaları hassas runtime bilgileri içerebilir.
+> `.env` ve `logs/` Git tarafından ignore edilir. Çünkü bu dosyalar hassas runtime bilgileri içerebilir.
 
 ---
 
@@ -194,7 +206,25 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. API'yi Çalıştır
+### 4. Local Environment Dosyası Oluştur
+
+```bash
+cp .env.example .env
+```
+
+Sonra `.env` dosyasını kendi lokal değerlerinle düzenle:
+
+```text
+SECRET_KEY=your-secret-key-minimum-32-chars
+DEMO_USER=your_username
+DEMO_PASSWORD=your_password
+ALGORITHM=HS256
+TOKEN_EXP_SECONDS=3600
+```
+
+Lokal demo testleri için demo kullanıcı bilgileri kullanılabilir. Bu değerler sadece development amaçlıdır, production ortamında kullanılmamalıdır.
+
+### 5. API'yi Çalıştır
 
 ```bash
 uvicorn main:app --reload
@@ -229,11 +259,13 @@ curl http://127.0.0.1:8000
 
 ### Login
 
-Demo kullanıcı bilgileri:
+Demo credentials artık lokal `.env` dosyasından yüklenir.
+
+Örnek lokal demo değerleri:
 
 ```text
-user: eren
-password: secure123
+DEMO_USER=eren
+DEMO_PASSWORD=secure123
 ```
 
 Request:
@@ -353,6 +385,7 @@ cat logs/audit.log
 | Alan | Durum |
 |---|---|
 | JWT authentication | Tamamlandı |
+| Environment-based configuration | Tamamlandı |
 | Pydantic validation | Tamamlandı |
 | Prompt injection detection | Tamamlandı |
 | Audit logging | Tamamlandı |
@@ -368,6 +401,7 @@ cat logs/audit.log
 
 - [x] FastAPI application scaffold
 - [x] JWT authentication
+- [x] Environment-based configuration
 - [x] Pydantic schemas
 - [x] Protected AI prediction endpoint
 - [x] Prompt injection guard
@@ -389,19 +423,18 @@ Bu proje eğitim ve portfolyo odaklıdır.
 Mevcut sınırlamalar:
 
 - Brute force protection şu an in-memory çalışır
-- Login demo kullanıcı bilgileriyle çalışır
-- JWT secret development için hardcoded durumdadır
+- Login lokal `.env` dosyasındaki demo credentials ile çalışır
 - Audit logs lokal dosyaya yazılır
 - AI prediction şu an mock response döner
 
 Production seviyesine taşımak için önerilen geliştirmeler:
 
-- Secret değerlerini environment variable'a taşımak
 - Demo login yerine gerçek user storage kullanmak
 - Password hashing eklemek
 - Redis ile distributed blocking ve rate limiting yapmak
 - HTTPS reverse proxy arkasında çalıştırmak
 - Monitoring ve alerting eklemek
+- Secret rotation uygulamak
 
 ---
 
@@ -412,6 +445,7 @@ Production seviyesine taşımak için önerilen geliştirmeler:
 - Pydantic
 - PyJWT
 - Uvicorn
+- python-dotenv
 - Structured JSON logging
 
 ---
